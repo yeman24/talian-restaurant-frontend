@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { DISHES, TASTING_MENUS, REVIEWS, GALLERY_ITEMS } from '@/data/mockData'
 import { apiClient } from '@/lib/api-client'
+import { IS_DEMO_MODE } from '@/lib/runtime'
 import type {
   Dish,
   TastingMenu,
@@ -11,10 +11,18 @@ import type {
   DashboardStats,
   ReservationStatus,
   ContactPayload,
+  ContactInquiry,
+  CellarItem,
 } from '@/types'
 
-// Realistic delay for mock fallback
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const loadMockData = () => import('@/data/mockData')
+
+const normalizeDish = (item: any): Dish => ({
+  ...item,
+  category: typeof item.category === 'string' ? item.category : item.category?.slug || item.category?.name || '',
+  price: Number(item.price),
+})
 
 // 1. Dishes List Hook
 export function useDishes(filters?: {
@@ -25,28 +33,19 @@ export function useDishes(filters?: {
   return useQuery<Dish[]>({
     queryKey: ['dishes', filters],
     queryFn: async () => {
-      try {
-        const queryParams = new URLSearchParams()
-        if (filters?.category && filters.category !== 'all') {
-          queryParams.append('category', filters.category)
-        }
-        if (filters?.dietary && filters.dietary !== 'all') {
-          queryParams.append('dietary', filters.dietary)
-        }
-        if (filters?.search && filters.search.trim()) {
-          queryParams.append('search', filters.search.trim())
-        }
+      const queryParams = new URLSearchParams()
+      if (filters?.category && filters.category !== 'all') queryParams.append('category', filters.category)
+      if (filters?.dietary && filters.dietary !== 'all') queryParams.append('dietary', filters.dietary)
+      if (filters?.search && filters.search.trim()) queryParams.append('search', filters.search.trim())
 
+      if (!IS_DEMO_MODE) {
         const res = await apiClient.get<any>(`/menu/dishes?${queryParams.toString()}`)
-        const list = res.data || res
-        if (Array.isArray(list) && list.length > 0) {
-          return list
-        }
-      } catch {
-        // Fall back to local mock data
+        const items = Array.isArray(res) ? res : res.data || []
+        return items.map(normalizeDish)
       }
 
-      await delay(200)
+      const { DISHES } = await loadMockData()
+      await delay(80)
       let list = [...DISHES]
 
       if (filters?.category && filters.category !== 'all') {
@@ -82,14 +81,9 @@ export function useDish(idOrSlug: string | undefined) {
     queryKey: ['dish', idOrSlug],
     queryFn: async () => {
       if (!idOrSlug) return undefined
-      try {
-        const dish = await apiClient.get<Dish>(`/menu/dishes/${idOrSlug}`)
-        if (dish) return dish
-      } catch {
-        // Fall back
-      }
-
-      await delay(150)
+      if (!IS_DEMO_MODE) return normalizeDish(await apiClient.get<any>(`/menu/dishes/${idOrSlug}`))
+      const { DISHES } = await loadMockData()
+      await delay(80)
       return DISHES.find((d) => d.id === idOrSlug || d.slug === idOrSlug)
     },
     enabled: Boolean(idOrSlug),
@@ -101,14 +95,9 @@ export function useTastingMenus() {
   return useQuery<TastingMenu[]>({
     queryKey: ['tasting-menus'],
     queryFn: async () => {
-      try {
-        const menus = await apiClient.get<TastingMenu[]>('/menu/tasting-menus')
-        if (Array.isArray(menus) && menus.length > 0) return menus
-      } catch {
-        // Fall back
-      }
-
-      await delay(150)
+      if (!IS_DEMO_MODE) return apiClient.get<TastingMenu[]>('/menu/tasting-menus')
+      const { TASTING_MENUS } = await loadMockData()
+      await delay(80)
       return TASTING_MENUS
     },
     staleTime: 1000 * 60 * 10,
@@ -120,14 +109,9 @@ export function useReviews() {
   return useQuery<Review[]>({
     queryKey: ['reviews'],
     queryFn: async () => {
-      try {
-        const reviews = await apiClient.get<Review[]>('/reviews')
-        if (Array.isArray(reviews) && reviews.length > 0) return reviews
-      } catch {
-        // Fall back
-      }
-
-      await delay(150)
+      if (!IS_DEMO_MODE) return apiClient.get<Review[]>('/reviews')
+      const { REVIEWS } = await loadMockData()
+      await delay(80)
       return REVIEWS
     },
   })
@@ -138,24 +122,21 @@ export function useGallery(category?: string) {
   return useQuery<GalleryItem[]>({
     queryKey: ['gallery', category],
     queryFn: async () => {
-      try {
+      if (!IS_DEMO_MODE) {
         const url = category && category !== 'all' ? `/gallery?category=${category.toUpperCase()}` : '/gallery'
         const items = await apiClient.get<any[]>(url)
-        if (Array.isArray(items) && items.length > 0) {
-          return items.map((item) => ({
-            id: item.id,
-            title: item.title,
-            category: item.category.toLowerCase(),
-            image: item.imageUrl || item.image,
-            caption: item.caption,
-            aspect: item.aspect || 'square',
-          }))
-        }
-      } catch {
-        // Fall back
+        return items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          category: item.category.toLowerCase(),
+          image: item.imageUrl || item.image,
+          caption: item.caption,
+          aspect: item.aspect || 'square',
+        }))
       }
 
-      await delay(200)
+      const { GALLERY_ITEMS } = await loadMockData()
+      await delay(80)
       if (!category || category === 'all') return GALLERY_ITEMS
       return GALLERY_ITEMS.filter((item) => item.category === category)
     },
@@ -167,21 +148,31 @@ export function useAvailability(date: string, guests: number) {
   return useQuery<AvailabilityResponse>({
     queryKey: ['availability', date, guests],
     queryFn: async () => {
-      try {
-        return await apiClient.get<AvailabilityResponse>(
-          `/reservations/availability?date=${date}&guests=${guests}`
+      if (!IS_DEMO_MODE) {
+        return apiClient.get<AvailabilityResponse>(
+          `/reservations/availability?date=${encodeURIComponent(date)}&guests=${guests}`
         )
-      } catch {
-        // Fall back calculation
-        const dayOfWeek = new Date(date).getUTCDay()
-        const isClosed = dayOfWeek === 1 || dayOfWeek === 2
-        return {
+      }
+
+      await delay(80)
+      const dayOfWeek = new Date(date).getUTCDay()
+      const isClosed = dayOfWeek === 1 || dayOfWeek === 2
+      const isSunday = dayOfWeek === 0
+      return {
           isAvailable: !isClosed,
           message: isClosed
-            ? 'AURA is closed on Mondays and Tuesdays for Highland foraging and cellar curation.'
+            ? 'AURA is closed on Mondays & Tuesdays for Highland foraging and cellar curation.'
             : undefined,
           dinnerSlots: isClosed
             ? []
+            : isSunday
+            ? [
+                { time: '17:00', status: 'Available', isAvailable: true },
+                { time: '17:45', status: 'Available', isAvailable: true },
+                { time: '18:30', status: 'Few tables left', isAvailable: true },
+                { time: '19:15', status: 'Available', isAvailable: true },
+                { time: '19:45', status: 'Available', isAvailable: true },
+              ]
             : [
                 { time: '17:30', status: 'Available', isAvailable: true },
                 { time: '18:15', status: 'Few tables left', isAvailable: true },
@@ -197,10 +188,10 @@ export function useAvailability(date: string, guests: number) {
                   { time: '13:15', status: 'Few tables left', isAvailable: true },
                 ]
               : [],
-        }
       }
     },
     enabled: Boolean(date && guests > 0),
+    placeholderData: (previousData) => previousData,
   })
 }
 
@@ -223,15 +214,29 @@ export function useCreateReservation() {
       dietaryNotes?: string
       specialOccasion?: string
       totalEstimate: number
+      policyAccepted: boolean
+      idempotencyKey: string
     }) => {
-      try {
-        const res = await apiClient.post<ReservationPayload>('/reservations', payload)
-        if (res && res.confirmationCode) return res
-      } catch {
-        // Fall back to local simulation
+      if (!IS_DEMO_MODE) {
+        const { idempotencyKey, totalEstimate: _clientTotalEstimate, ...reservationPayload } = payload
+        const result = await apiClient.post<any>('/reservations', {
+          ...reservationPayload,
+          service: payload.service?.toUpperCase(),
+          seatingPreference: payload.seatingPreference?.replace('-', '_').toUpperCase(),
+          policyAccepted: payload.policyAccepted,
+        },
+        { 'Idempotency-Key': idempotencyKey })
+        return {
+          ...result,
+          service: String(result.service || payload.service || 'dinner').toLowerCase(),
+          guests: result.guests ?? result.guestsCount,
+          experience: result.experience ?? result.experienceName,
+          seatingPreference: String(result.seatingPreference || payload.seatingPreference || 'dining-room').toLowerCase().replace('_', '-'),
+          totalEstimate: Number(result.totalEstimate ?? payload.totalEstimate),
+        } as ReservationPayload
       }
 
-      await delay(600)
+      await delay(120)
       const code = `AURA-${Math.floor(100000 + Math.random() * 900000)}`
       const fallbackRes: ReservationPayload = {
         confirmationCode: code,
@@ -267,20 +272,16 @@ export function useCreateReservation() {
 // 8. Stripe Payment Intent Mutation
 export function useCreatePaymentIntent() {
   return useMutation({
-    mutationFn: async ({ reservationId, amount }: { reservationId: string; amount: number }) => {
-      try {
-        return await apiClient.post<{ clientSecret: string; amount: number; currency: string }>(
+    mutationFn: async ({ reservationId, amount, email, idempotencyKey }: { reservationId: string; amount: number; email: string; idempotencyKey: string }) => {
+      if (!IS_DEMO_MODE) {
+        return apiClient.post<{ clientSecret: string; amount: number; currency: string }>(
           '/payments/create-intent',
-          { reservationId, amount }
+          { reservationId, email },
+          { 'Idempotency-Key': idempotencyKey },
         )
-      } catch {
-        // Mock fallback
-        return {
-          clientSecret: `mock_pi_${Date.now()}_secret`,
-          amount,
-          currency: 'GBP',
-        }
       }
+      await delay(80)
+      return { clientSecret: `mock_pi_${Date.now()}_secret`, amount, currency: 'GBP' }
     },
   })
 }
@@ -290,11 +291,8 @@ export function useAdminStats() {
   return useQuery<DashboardStats>({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      try {
-        return await apiClient.get<DashboardStats>('/admin/dashboard/stats')
-      } catch {
-        // Fallback demo metrics
-        return {
+      if (!IS_DEMO_MODE) return apiClient.get<DashboardStats>('/admin/dashboard/stats')
+      return {
           metrics: {
             totalReservationsCount: 142,
             todayCovers: 24,
@@ -310,7 +308,6 @@ export function useAdminStats() {
             'Chef’s Atelier Counter (10 Courses)': 30,
           },
           recentBookings: [],
-        }
       }
     },
     refetchInterval: 1000 * 30, // 30s polling for executive dashboard
@@ -322,14 +319,11 @@ export function useAdminReservations(status?: string, date?: string) {
   return useQuery<{ data: ReservationPayload[]; meta: any }>({
     queryKey: ['admin-reservations', status, date],
     queryFn: async () => {
-      try {
-        const queryParams = new URLSearchParams()
-        if (status) queryParams.append('status', status)
-        if (date) queryParams.append('date', date)
-        return await apiClient.get<any>(`/reservations?${queryParams.toString()}`)
-      } catch {
-        // Fallback demo reservations
-        return {
+      const queryParams = new URLSearchParams()
+      if (status) queryParams.append('status', status)
+      if (date) queryParams.append('date', date)
+      if (!IS_DEMO_MODE) return apiClient.get<any>(`/reservations?${queryParams.toString()}`)
+      return {
           data: [
             {
               id: 'res-1',
@@ -378,9 +372,37 @@ export function useAdminReservations(status?: string, date?: string) {
             },
           ],
           meta: { total: 3, page: 1, limit: 20 },
-        }
       }
     },
+  })
+}
+
+export function useAdminInquiries(status?: string) {
+  return useQuery<{ data: ContactInquiry[]; meta: any }>({
+    queryKey: ['admin-inquiries', status],
+    queryFn: async () => {
+      const query = status ? `?status=${encodeURIComponent(status)}` : ''
+      return apiClient.get<{ data: ContactInquiry[]; meta: any }>(`/contact/inquiries${query}`)
+    },
+  })
+}
+
+export function useUpdateInquiryStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: 'IN_PROGRESS' | 'RESOLVED' }) =>
+      apiClient.patch<ContactInquiry>(`/contact/inquiries/${id}/status`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-inquiries'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+    },
+  })
+}
+
+export function useCellarItems() {
+  return useQuery<CellarItem[]>({
+    queryKey: ['cellar-items'],
+    queryFn: () => apiClient.get<CellarItem[]>('/cellar/items'),
   })
 }
 
@@ -460,12 +482,30 @@ export function useUploadGalleryImage() {
 export function useSubmitContact() {
   return useMutation({
     mutationFn: async (payload: ContactPayload) => {
-      try {
-        return await apiClient.post('/contact', payload)
-      } catch {
-        await delay(500)
-        return { success: true, message: 'Your message has been received by the Maitre d’.' }
+      if (!IS_DEMO_MODE) {
+        const inquiryTypeMap = {
+          general: 'GENERAL',
+          'private-dining': 'PRIVATE_DINING',
+          press: 'PRESS',
+          'cellar-master': 'CELLAR_MASTER',
+        } as const
+        return apiClient.post('/contact/inquiries', {
+          ...payload,
+          inquiryType: inquiryTypeMap[payload.inquiryType as keyof typeof inquiryTypeMap] || payload.inquiryType,
+        })
       }
+      await delay(80)
+      return { success: true, message: 'Your message has been received by the Maitre d’.' }
+    },
+  })
+}
+
+export function useSubmitNewsletter() {
+  return useMutation({
+    mutationFn: async ({ email }: { email: string }) => {
+      if (!IS_DEMO_MODE) return apiClient.post('/contact/newsletter', { email })
+      await delay(80)
+      return { success: true, email }
     },
   })
 }

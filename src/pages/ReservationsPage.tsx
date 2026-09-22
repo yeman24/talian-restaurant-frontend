@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ReservationWizard } from '@/components/reservations/ReservationWizard'
 import { HelpCircle } from 'lucide-react'
@@ -29,45 +30,58 @@ export const ReservationsPage: React.FC = () => {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Table Bookings"
-        title="Reserve an Experience"
-        subtitle="We invite you to join us for our Autumn Tasting Menu. Every sitting is prepared with meticulous bespoke attention."
-        breadcrumbs={[{ label: 'Reservations' }]}
-        accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85"
-      />
+      <div className="no-print">
+        <PageHeader
+          eyebrow="Table Bookings"
+          title="Reserve an Experience"
+          subtitle="We invite you to join us for our Autumn Tasting Menu. Every sitting is prepared with meticulous bespoke attention."
+          breadcrumbs={[{ label: 'Reservations' }]}
+          accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85"
+        />
+      </div>
 
       {/* Main Reservation Flow */}
       <ReservationWizard />
 
       {/* FAQs and Hospitality Information */}
-      <section className="max-w-5xl mx-auto px-6 py-20 border-t border-stone-800">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="no-print max-w-5xl mx-auto px-6 py-20 border-t border-[#e2d7ba]"
+      >
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 mb-2">
-            <HelpCircle className="w-3.5 h-3.5 text-[#c5a059]" />
-            <span className="text-xs uppercase tracking-[0.28em] text-[#c5a059] font-sans font-medium">
+            <HelpCircle className="w-3.5 h-3.5 text-[#12141a]" />
+            <span className="text-xs uppercase tracking-[0.25em] text-[#12141a] font-sans font-semibold">
               Guest Inquiries
             </span>
           </div>
-          <h3 className="font-serif text-3xl text-white font-light">
+          <h3 className="font-serif text-4xl sm:text-5xl text-[#12141a]">
             Dining Policies & Frequently Asked Questions
           </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {faqs.map((faq, i) => (
-            <div
+            <motion.div
               key={i}
-              className="p-6 rounded-xl bg-[#0e1017] border border-stone-800/80 space-y-2"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              whileHover={{ y: -3 }}
+              className="p-6 rounded-2xl bg-white border border-[#e2d7ba] shadow-md space-y-2 hover:border-[#12141a] transition-colors"
             >
-              <h4 className="font-serif text-base text-[#f5eed8] font-normal leading-snug">
+              <h4 className="font-serif text-2xl text-[#12141a] leading-snug">
                 {faq.q}
               </h4>
-              <p className="text-xs text-stone-400 font-light leading-relaxed">{faq.a}</p>
-            </div>
+              <p className="text-xs text-[#5e6576] font-sans leading-relaxed">{faq.a}</p>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
     </div>
   )
 }

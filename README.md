@@ -9,11 +9,11 @@ A luxury, production-grade frontend web application for **AURA**, an acclaimed t
 - **Language**: TypeScript 6
 - **Styling**: Tailwind CSS v4 + Custom Luxury Design System
 - **Animations**: Framer Motion 13 (Page transitions, scroll reveals, lightbox modals)
-- **State & Data Fetching**: TanStack Query v5 (Simulated realistic asynchronous latency, skeleton loading, caching)
+- **State & Data Fetching**: TanStack Query v5 (timeouts, skeleton loading, retries, and caching)
 - **Forms & Validation**: React Hook Form + Zod
 - **Icons**: Lucide React
 - **Celebration Effects**: Canvas Confetti
-- **AI Concierge**: Menu-aware dining assistant with an optional server-side Gemini Flash-Lite integration and offline fallback
+- **AI Concierge**: Menu-aware dining assistant with an optional server-side Gemini Flash-Lite integration
 
 ## Architectural Overview
 
@@ -42,6 +42,10 @@ src/
 ## AI Dining Concierge
 
 The floating concierge is available immediately using the verified local menu dataset. To enable Gemini-powered responses, add `GEMINI_API_KEY` to `backend/.env` and restart the backend. The key remains server-side. The default model is `gemini-3.5-flash-lite`; without a key, the endpoint returns grounded local recommendations instead.
+
+## Demo mode
+
+Normal operation reports backend failures to the user instead of fabricating reservations or availability. To intentionally run the standalone mock-data experience, copy `.env.example` to `.env` and set `VITE_DEMO_MODE=true`.
 
 ## Available Scripts
 

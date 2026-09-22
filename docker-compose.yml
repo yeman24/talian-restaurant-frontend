@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: aura
-      POSTGRES_PASSWORD: aura_secret
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
       POSTGRES_DB: aura_db
     ports:
       - "5432:5432"
@@ -35,7 +35,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: aura_backend
     restart: unless-stopped
@@ -49,14 +49,28 @@ services:
     environment:
       PORT: 4000
       NODE_ENV: production
-      DATABASE_URL: postgresql://aura:aura_secret@postgres:5432/aura_db?schema=public
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL for the backend container}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      FRONTEND_URL: http://localhost:5173
-      JWT_ACCESS_SECRET: aura_super_secret_access_jwt_key_2025_edinburgh_fine_dining
-      JWT_REFRESH_SECRET: aura_super_secret_refresh_jwt_key_2025_edinburgh_cellar_vaults
+      FRONTEND_URL: ${FRONTEND_URL:?Set FRONTEND_URL}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?Set JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Set JWT_REFRESH_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY:?Set RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:?Set RESEND_FROM_EMAIL}
+      RESEND_ALERT_EMAIL: ${RESEND_ALERT_EMAIL:?Set RESEND_ALERT_EMAIL}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:?Set CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:?Set CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:?Set CLOUDINARY_API_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      DEPOSIT_REQUIRED: ${DEPOSIT_REQUIRED:-false}
     volumes:
-      - ./backend/uploads:/app/uploads
+      - ../backend/uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4000/api/v1/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   postgres_data:

@@ -1,8 +1,8 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Award, Sparkles, Trees } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { Button } from '@/components/common/Button'
+import { ButtonLink } from '@/components/common/ButtonLink'
 
 export const AboutPage: React.FC = () => {
   const partners = [
@@ -51,24 +51,30 @@ export const AboutPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-20 space-y-28">
         {/* Story Section 1: The Founders */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center"
+        >
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#c5a059]" />
-              <span className="text-xs uppercase tracking-[0.28em] text-[#c5a059] font-sans font-medium">
+              <Sparkles className="w-3.5 h-3.5 text-[#12141a]" />
+              <span className="text-xs uppercase tracking-[0.25em] text-[#12141a] font-sans font-semibold">
                 The Leadership
               </span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-4xl text-white font-light leading-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl text-[#12141a] leading-tight">
               Chef Patron Euan Macleod & Head Sommelier Fiona Sinclair
             </h2>
-            <p className="text-stone-300 font-light text-sm sm:text-base leading-relaxed">
+            <p className="text-[#4a5160] font-sans text-sm sm:text-base leading-relaxed">
               Born in the Outer Hebrides and trained in Copenhagen, Paris, and San Sebastián, Chef
               Euan Macleod returned home to Scotland with an uncompromising vision: to liberate
               Scottish gastronomy from convention and elevate its untamed ingredients to world-class
               modernity.
             </p>
-            <p className="text-stone-400 font-light text-sm leading-relaxed">
+            <p className="text-[#5e6576] font-sans text-sm leading-relaxed">
               Together with Head Sommelier Fiona Sinclair—whose cellaring program champions rare
               biodynamic European estates alongside silent distillery single malt whiskies—AURA has
               become a sanctuary of quiet luxury and sensory revelation in Edinburgh.
@@ -76,127 +82,182 @@ export const AboutPage: React.FC = () => {
           </div>
 
           <div className="lg:col-span-6 grid grid-cols-2 gap-4">
-            <div className="rounded-lg overflow-hidden border border-stone-800 aspect-[3/4] bg-stone-900">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-2xl overflow-hidden border border-[#e2d7ba] aspect-[3/4] bg-stone-100 shadow-md"
+            >
               <img
-                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=85"
+                src="/images/chef_euan.jpg"
                 alt="Chef Patron Euan Macleod"
-                className="w-full h-full object-cover brightness-90"
+                width="1200"
+                height="1847"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover brightness-95"
               />
-            </div>
-            <div className="rounded-lg overflow-hidden border border-stone-800 aspect-[3/4] bg-stone-900 mt-8">
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-2xl overflow-hidden border border-[#e2d7ba] aspect-[3/4] bg-stone-100 mt-8 shadow-md"
+            >
               <img
-                src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=85"
+                src="/images/sommelier_fiona.jpg"
                 alt="Head Sommelier Fiona Sinclair in Cellar"
-                className="w-full h-full object-cover brightness-90"
+                width="1200"
+                height="1847"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover brightness-95"
               />
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Story Section 2: Terroir & Foraging Partners */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 mb-3">
-              <Trees className="w-3.5 h-3.5 text-[#c5a059]" />
-              <span className="text-xs uppercase tracking-[0.28em] text-[#c5a059] font-sans font-medium">
+              <Trees className="w-3.5 h-3.5 text-[#12141a]" />
+              <span className="text-xs uppercase tracking-[0.25em] text-[#12141a] font-sans font-semibold">
                 Provenance & Custodians
               </span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-4xl text-white font-light mb-4">
+            <h2 className="font-serif text-4xl sm:text-5xl text-[#12141a] mb-4">
               Partners of the Scottish Wilds
             </h2>
-            <p className="text-stone-400 font-light text-sm sm:text-base leading-relaxed">
+            <p className="text-[#4a5160] font-sans text-sm sm:text-base leading-relaxed">
               We do not purchase from commercial wholesalers. Our produce is procured through direct
               pacts with independent hand-divers, conservation estates, and small-batch crafters.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {partners.map((p) => (
-              <div
+            {partners.map((p, idx) => (
+              <motion.div
                 key={p.title}
-                className="p-6 rounded-xl bg-[#0e1017] border border-stone-800 hover:border-[#c5a059]/50 transition-colors flex flex-col justify-between"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="p-6 rounded-2xl bg-white border border-[#e2d7ba] shadow-md hover:border-[#12141a] transition-colors flex flex-col justify-between"
               >
                 <div>
-                  <span className="text-[10px] uppercase tracking-widest text-[#c5a059] font-sans block mb-1">
+                  <span className="text-[10px] uppercase tracking-widest text-[#12141a] font-sans font-bold block mb-1">
                     {p.region}
                   </span>
-                  <h3 className="font-serif text-xl text-white mb-2">{p.title}</h3>
-                  <p className="text-xs text-stone-300 font-medium mb-3">{p.partner}</p>
-                  <p className="text-xs text-stone-400 font-light leading-relaxed">{p.desc}</p>
+                  <h3 className="font-serif text-2xl text-[#12141a] mb-2">{p.title}</h3>
+                  <p className="text-xs text-[#12141a] font-medium mb-3 font-sans">{p.partner}</p>
+                  <p className="text-xs text-[#5e6576] font-sans leading-relaxed">{p.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Story Section 3: Architecture */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-[#0e1017] border border-stone-800/80 rounded-2xl p-8 sm:p-12">
-          <div className="lg:col-span-5 rounded-lg overflow-hidden border border-stone-800 aspect-[4/3] bg-stone-900">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-white border border-[#e2d7ba] rounded-2xl p-8 sm:p-12 shadow-md"
+        >
+          <div className="lg:col-span-5 rounded-xl overflow-hidden border border-[#e2d7ba] aspect-[4/3] bg-stone-100 shadow-sm">
             <img
               src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85"
               alt="The historic vaults at Royal Terrace Edinburgh"
-              className="w-full h-full object-cover brightness-85"
+              width="1000"
+              height="750"
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                if (e.currentTarget.src !== window.location.origin + '/images/vault_dining.jpg') {
+                  e.currentTarget.src = '/images/vault_dining.jpg';
+                }
+              }}
+              className="w-full h-full object-cover brightness-95"
             />
           </div>
           <div className="lg:col-span-7 space-y-4">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a059] font-sans font-medium">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#12141a] font-sans font-semibold">
               The Architecture
             </span>
-            <h3 className="font-serif text-3xl text-white font-light">
+            <h3 className="font-serif text-3xl sm:text-4xl text-[#12141a]">
               Restored 18th-Century Georgian Stone Vaults
             </h3>
-            <p className="text-stone-300 font-light text-sm leading-relaxed">
+            <p className="text-[#4a5160] font-sans text-sm leading-relaxed">
               Located on the eastern crest of Calton Hill along Edinburgh’s historic Royal Terrace,
               our dining sanctuary is carved beneath Georgian flagstones once traversed by 18th-century
               merchants and Scottish Enlightenment luminaries.
             </p>
-            <p className="text-stone-400 font-light text-xs leading-relaxed">
+            <p className="text-[#5e6576] font-sans text-xs leading-relaxed">
               Designed in collaboration with Edinburgh preservation artisans, the space blends
               exposed sandstone masonry with charred Scottish larch, tactile linens, warm bronze
               accents, and discreet acoustic engineering for complete subterranean peace.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Accolades Timeline */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 mb-3">
-              <Award className="w-3.5 h-3.5 text-[#c5a059]" />
-              <span className="text-xs uppercase tracking-[0.28em] text-[#c5a059] font-sans font-medium">
+              <Award className="w-3.5 h-3.5 text-[#12141a]" />
+              <span className="text-xs uppercase tracking-[0.25em] text-[#12141a] font-sans font-semibold">
                 Milestones
               </span>
             </div>
-            <h2 className="font-serif text-3xl text-white font-light">
+            <h2 className="font-serif text-4xl sm:text-5xl text-[#12141a]">
               The Path to Two Michelin Stars
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {timeline.map((item) => (
-              <div
+            {timeline.map((item, idx) => (
+              <motion.div
                 key={item.year}
-                className="p-6 rounded-xl bg-[#0a0c10] border border-stone-800/80 relative"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="p-6 rounded-2xl bg-white border border-[#e2d7ba] shadow-md relative"
               >
-                <span className="font-serif text-3xl text-[#c5a059] font-light block mb-2">
+                <span className="font-serif text-4xl text-[#12141a] font-bold block mb-2">
                   {item.year}
                 </span>
-                <h4 className="font-serif text-lg text-white mb-2">{item.title}</h4>
-                <p className="text-xs text-stone-400 font-light leading-relaxed">{item.desc}</p>
-              </div>
+                <h4 className="font-serif text-2xl text-[#12141a] mb-2">{item.title}</h4>
+                <p className="text-xs text-[#5e6576] font-sans leading-relaxed">{item.desc}</p>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Bottom CTA */}
-        <div className="text-center pt-8 border-t border-stone-800">
-          <Link to="/reservations">
-            <Button variant="gold" size="lg">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center pt-8 border-t border-[#e2d7ba]"
+        >
+          <ButtonLink to="/reservations" variant="gold" size="lg">
               Reserve an Autumn Experience
-            </Button>
-          </Link>
-        </div>
+          </ButtonLink>
+        </motion.div>
       </div>
     </div>
   )

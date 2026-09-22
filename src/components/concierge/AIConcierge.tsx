@@ -106,9 +106,10 @@ export const AIConcierge: React.FC = () => {
         message: trimmed,
         history,
       })
+      const reply = result?.message || localReply(trimmed)
       setMessages((current) => [
         ...current,
-        { id: nextMessageId(), role: 'assistant', content: result.message },
+        { id: nextMessageId(), role: 'assistant', content: reply },
       ])
     } catch {
       await new Promise((resolve) => setTimeout(resolve, 350))
@@ -122,17 +123,17 @@ export const AIConcierge: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="no-print">
       <motion.button
         type="button"
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setIsOpen((current) => !current)}
-        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full border border-[#c5a059]/50 bg-[#141720]/95 px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#f5eed8] shadow-2xl shadow-black/60 backdrop-blur-xl transition-colors hover:border-[#c5a059] hover:text-white"
+        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full border border-[#d8caa4] bg-[#12141a] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#fcf5df] shadow-2xl shadow-black/30 backdrop-blur-xl transition-all hover:bg-[#202532] cursor-pointer font-sans"
         aria-label={isOpen ? 'Close AI dining concierge' : 'Open AI dining concierge'}
         aria-expanded={isOpen}
       >
-        {isOpen ? <ChevronDown className="h-4 w-4 text-[#c5a059]" /> : <MessageCircle className="h-4 w-4 text-[#c5a059]" />}
+        {isOpen ? <ChevronDown className="h-4 w-4 text-[#fcf5df]" /> : <MessageCircle className="h-4 w-4 text-[#fcf5df]" />}
         <span className="hidden sm:inline">AI Concierge</span>
         <span className="sm:hidden">Concierge</span>
       </motion.button>
@@ -147,25 +148,25 @@ export const AIConcierge: React.FC = () => {
             role="dialog"
             aria-modal="false"
             aria-label="AURA AI dining concierge"
-            className="fixed bottom-20 right-4 z-40 flex h-[min(650px,calc(100vh-7rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-[#c5a059]/35 bg-[#0e1017]/98 shadow-2xl shadow-black/70 backdrop-blur-2xl"
+            className="fixed bottom-20 right-4 z-40 flex h-[min(650px,calc(100vh-7rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-[#e2d7ba] bg-[#fcf5df] shadow-2xl text-[#12141a]"
           >
-            <header className="flex items-start justify-between border-b border-stone-800/80 bg-[#141720]/80 p-5">
+            <header className="flex items-start justify-between border-b border-[#e2d7ba] bg-white p-5">
               <div>
-                <div className="mb-1 flex items-center gap-2 text-[#c5a059]">
+                <div className="mb-1 flex items-center gap-2 text-[#12141a]">
                   <Sparkles className="h-4 w-4" />
-                  <span className="text-[10px] font-medium uppercase tracking-[0.25em]">AURA Concierge</span>
+                  <span className="text-[10px] font-medium uppercase tracking-[0.25em] font-sans">Aura Concierge</span>
                 </div>
-                <p className="text-xs text-stone-400">Menu guidance, pairings, and reservation help</p>
+                <p className="text-xs text-[#5e6576] font-sans">Menu guidance, pairings, and reservation help</p>
               </div>
-              <button type="button" onClick={() => setIsOpen(false)} className="rounded-full p-1.5 text-stone-400 transition-colors hover:bg-white/5 hover:text-white" aria-label="Close AI dining concierge">
+              <button type="button" onClick={() => setIsOpen(false)} className="rounded-full p-1.5 text-[#5e6576] transition-colors hover:bg-[#fcf5df] hover:text-[#12141a] cursor-pointer" aria-label="Close AI dining concierge">
                 <X className="h-4 w-4" />
               </button>
             </header>
 
-            <div className="flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4 font-sans" aria-live="polite">
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[88%] rounded-2xl px-3.5 py-3 text-sm leading-relaxed ${message.role === 'user' ? 'rounded-br-sm bg-[#c5a059] text-black' : 'rounded-bl-sm border border-stone-800 bg-[#141720] text-stone-200'}`}>
+                  <div className={`max-w-[88%] rounded-2xl px-3.5 py-3 text-sm leading-relaxed ${message.role === 'user' ? 'rounded-br-sm bg-[#12141a] text-[#fcf5df]' : 'rounded-bl-sm border border-[#e2d7ba] bg-white text-[#12141a] shadow-xs'}`}>
                     {message.content}
                   </div>
                 </div>
@@ -174,7 +175,7 @@ export const AIConcierge: React.FC = () => {
               {messages.length === 1 && (
                 <div className="space-y-2 pt-2">
                   {STARTER_PROMPTS.map((prompt) => (
-                    <button key={prompt} type="button" onClick={() => sendMessage(prompt)} className="w-full rounded-lg border border-stone-800 bg-[#101319] px-3 py-2 text-left text-xs text-stone-300 transition-colors hover:border-[#c5a059]/60 hover:text-white">
+                    <button key={prompt} type="button" onClick={() => sendMessage(prompt)} className="w-full rounded-lg border border-[#e2d7ba] bg-white px-3 py-2 text-left text-xs text-[#12141a] transition-all hover:border-[#12141a] hover:bg-[#fcf5df]/50 cursor-pointer font-sans">
                       {prompt}
                     </button>
                   ))}
@@ -183,30 +184,30 @@ export const AIConcierge: React.FC = () => {
 
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl rounded-bl-sm border border-stone-800 bg-[#141720] px-4 py-3 text-xs text-stone-400">Curating a suggestion…</div>
+                  <div className="rounded-2xl rounded-bl-sm border border-[#e2d7ba] bg-white px-4 py-3 text-xs text-[#5e6576] font-sans">Curating a suggestion…</div>
                 </div>
               )}
               <div ref={endOfMessages} />
             </div>
 
-            <div className="border-t border-stone-800/80 bg-[#101319] p-4">
-              <div className="mb-3 flex items-center gap-1.5 text-[10px] leading-relaxed text-stone-500">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#c5a059]" />
+            <div className="border-t border-[#e2d7ba] bg-white p-4">
+              <div className="mb-3 flex items-center gap-1.5 text-[10px] leading-relaxed text-[#5e6576] font-sans">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#12141a]" />
                 Allergy requests must be confirmed by our kitchen team.
               </div>
               <form onSubmit={(event) => { event.preventDefault(); void sendMessage() }} className="flex gap-2">
-                <input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about the menu…" aria-label="Ask the AI dining concierge" className="min-w-0 flex-1 rounded-lg border border-stone-800 bg-[#141720] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-stone-600 focus:border-[#c5a059]" />
-                <button type="submit" disabled={!input.trim() || isTyping} className="rounded-lg bg-[#c5a059] px-3 text-black transition-colors hover:bg-[#d4af55] disabled:cursor-not-allowed disabled:opacity-40" aria-label="Send message">
+                <input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about the menu…" aria-label="Ask the AI dining concierge" className="min-w-0 flex-1 rounded-lg border border-[#d8caa4] bg-[#fcf5df]/40 px-3 py-2.5 text-sm text-[#12141a] outline-none transition-colors placeholder:text-[#8890a0] focus:border-[#12141a] font-sans" />
+                <button type="submit" disabled={!input.trim() || isTyping} className="rounded-lg bg-[#12141a] px-3 text-[#fcf5df] transition-colors hover:bg-[#202532] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer" aria-label="Send message">
                   <Send className="h-4 w-4" />
                 </button>
               </form>
-              <Link to="/reservations" onClick={() => setIsOpen(false)} className="mt-3 flex items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#c5a059] transition-colors hover:text-white">
+              <Link to="/reservations" onClick={() => setIsOpen(false)} className="mt-3 flex items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#12141a] transition-colors hover:text-black font-sans">
                 <Calendar className="h-3.5 w-3.5" /> Reserve an experience <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </motion.section>
         )}
       </AnimatePresence>
-    </>
+    </div>
   )
 }

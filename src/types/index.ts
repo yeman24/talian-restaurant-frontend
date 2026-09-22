@@ -18,10 +18,10 @@ export interface UserProfile {
 }
 
 export interface AuthTokens {
-  accessToken: string
-  refreshToken: string
-  tokenType: string
-  expiresIn: string
+  accessToken?: string
+  refreshToken?: string
+  tokenType?: string
+  expiresIn?: string
 }
 
 export interface AuthResponse extends AuthTokens {
@@ -155,4 +155,32 @@ export interface ContactPayload {
   guestsCount?: number
   preferredDate?: string
   message: string
+}
+
+export type InquiryStatus = 'UNREAD' | 'IN_PROGRESS' | 'RESOLVED'
+
+export interface ContactInquiry {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  inquiryType: 'GENERAL' | 'PRIVATE_DINING' | 'CELLAR_MASTER' | 'PRESS'
+  status: InquiryStatus
+  preferredDate?: string
+  guestsCount?: number
+  message: string
+  replyNotes?: string
+  createdAt: string
+}
+
+export interface CellarItem {
+  id: string
+  name: string
+  vintage?: string
+  region?: string
+  stockBottles: number
+  pairingWith?: string
+  allocationStatus?: string
+  temperatureZone?: string
+  updatedAt: string
 }

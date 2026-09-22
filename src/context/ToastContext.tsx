@@ -61,20 +61,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-auto bg-[#14171e]/95 backdrop-blur-xl border border-[#c5a059]/30 rounded-xl p-4 shadow-2xl shadow-black/80 flex items-start gap-3"
+              className="pointer-events-auto bg-[#12141a] border border-[#d8caa4] rounded-xl p-4 shadow-2xl flex items-start gap-3 text-[#fcf5df]"
             >
               <div className="mt-0.5 shrink-0">
-                {t.type === 'success' && <CheckCircle2 className="w-5 h-5 text-[#c5a059]" />}
+                {t.type === 'success' && <CheckCircle2 className="w-5 h-5 text-[#fcf5df]" />}
                 {t.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-400" />}
-                {t.type === 'info' && <Info className="w-5 h-5 text-stone-300" />}
+                {t.type === 'info' && <Info className="w-5 h-5 text-[#fcf5df]" />}
               </div>
-              <div className="flex-1 pr-2">
-                <p className="text-sm font-medium text-white">{t.title}</p>
-                {t.message && <p className="text-xs text-stone-400 mt-0.5 leading-relaxed">{t.message}</p>}
+              <div className="flex-1 pr-2 font-sans">
+                <p className="text-sm font-medium text-[#fcf5df]">{t.title}</p>
+                {t.message && <p className="text-xs text-[#b4bcc9] mt-0.5 leading-relaxed">{t.message}</p>}
               </div>
               <button
                 onClick={() => removeToast(t.id)}
-                className="text-stone-400 hover:text-white transition-colors p-0.5 rounded"
+                className="text-[#b4bcc9] hover:text-white transition-colors p-0.5 rounded cursor-pointer"
                 aria-label="Close notification"
               >
                 <X className="w-4 h-4" />

@@ -1,8 +1,10 @@
 import React from 'react'
+import { motion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
+  children?: React.ReactNode
   variant?: 'primary' | 'outline' | 'ghost' | 'secondary' | 'gold'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean
@@ -21,24 +23,26 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       rightIcon,
       children,
       disabled,
+      whileHover,
+      whileTap,
       ...props
     },
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium tracking-wider uppercase transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#c5a059] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]'
+      'inline-flex items-center justify-center font-medium tracking-wider uppercase transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#12141a] disabled:opacity-50 disabled:pointer-events-none cursor-pointer'
 
     const variants = {
       primary:
-        'bg-[#c5a059] hover:bg-[#d4af55] text-black shadow-lg shadow-[#c5a059]/15 hover:shadow-[#c5a059]/30 font-semibold',
+        'bg-[#12141a] hover:bg-[#202532] text-[#fcf5df] shadow-md shadow-black/10 font-semibold',
       gold:
-        'bg-gradient-to-r from-[#d4af55] via-[#c5a059] to-[#b38d43] hover:brightness-110 text-black font-semibold shadow-lg shadow-[#c5a059]/20',
+        'bg-[#12141a] hover:bg-[#222836] text-[#fcf5df] font-semibold shadow-md shadow-black/15',
       outline:
-        'border border-[#c5a059]/40 hover:border-[#c5a059] text-[#f5eed8] hover:bg-[#c5a059]/10 hover:text-white backdrop-blur-sm',
+        'border border-[#12141a] hover:bg-[#12141a] text-[#12141a] hover:text-[#fcf5df]',
       ghost:
-        'text-stone-300 hover:text-[#c5a059] hover:bg-white/5',
+        'text-[#12141a]/80 hover:text-[#12141a] hover:bg-[#12141a]/5',
       secondary:
-        'bg-[#1a1e27] hover:bg-[#252b38] text-white border border-stone-800 hover:border-stone-700',
+        'bg-white hover:bg-[#f6eed2] text-[#12141a] border border-[#e2d7ba]',
     }
 
     const sizes = {
@@ -48,9 +52,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <button
+      <motion.button
         ref={ref}
         disabled={disabled || isLoading}
+        whileHover={disabled || isLoading ? undefined : whileHover !== undefined ? whileHover : { scale: 1.02, y: -1 }}
+        whileTap={disabled || isLoading ? undefined : whileTap !== undefined ? whileTap : { scale: 0.98 }}
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         {...props}
       >
@@ -61,7 +67,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         <span>{children}</span>
         {!isLoading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
-      </button>
+      </motion.button>
     )
   }
 )

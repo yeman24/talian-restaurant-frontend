@@ -4,31 +4,17 @@ export const ACCESS_TOKEN_KEY = 'aura_access_token';
 export const REFRESH_TOKEN_KEY = 'aura_refresh_token';
 
 class ApiClient {
+  private readonly requestTimeoutMs = 8000;
   private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
+  private refreshSubscribers: ((token: string | null) => void)[] = [];
 
-  private subscribeTokenRefresh(cb: (token: string) => void) {
+  private subscribeTokenRefresh(cb: (token: string | null) => void) {
     this.refreshSubscribers.push(cb);
   }
 
-  private onRefreshed(token: string) {
+  private onRefreshed(token: string | null) {
     this.refreshSubscribers.forEach((cb) => cb(token));
     this.refreshSubscribers = [];
-  }
-
-  private getAccessToken(): string | null {
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
-  }
-
-  private getRefreshToken(): string | null {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
-  }
-
-  private setTokens(accessToken: string, refreshToken?: string) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    if (refreshToken) {
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    }
   }
 
   clearTokens() {
@@ -42,61 +28,69 @@ class ApiClient {
     isRetry = false
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-    const token = this.getAccessToken();
-
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string>),
     };
-
-    // Auto attach Bearer token
-    if (token && !headers['Authorization']) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
 
     // Default JSON content-type if not FormData
     if (!(options.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem(ACCESS_TOKEN_KEY) : null;
+    if (token && !headers['Authorization']) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), this.requestTimeoutMs);
+    const abortExternalRequest = () => controller.abort();
+    options.signal?.addEventListener('abort', abortExternalRequest, { once: true });
+
     try {
       const response = await fetch(url, {
         ...options,
+        signal: controller.signal,
+        credentials: 'include',
         headers,
       });
 
       // Handle 401 Unauthorized - Attempt Token Refresh
-      if (response.status === 401 && !isRetry && this.getRefreshToken()) {
+      if (response.status === 401 && !isRetry) {
         if (!this.isRefreshing) {
           this.isRefreshing = true;
           try {
             const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refreshToken: this.getRefreshToken() }),
+              credentials: 'include',
+              body: JSON.stringify({}),
             });
 
             if (refreshRes.ok) {
-              const refreshData = await refreshRes.json();
-              const newTokens = refreshData.data || refreshData;
-              this.setTokens(newTokens.accessToken, newTokens.refreshToken);
               this.isRefreshing = false;
-              this.onRefreshed(newTokens.accessToken);
+              this.onRefreshed('cookie');
 
               // Retry original request
-              headers['Authorization'] = `Bearer ${newTokens.accessToken}`;
               return this.request<T>(endpoint, { ...options, headers }, true);
             } else {
               this.clearTokens();
               this.isRefreshing = false;
+              this.onRefreshed(null);
             }
           } catch {
             this.clearTokens();
             this.isRefreshing = false;
+            this.onRefreshed(null);
           }
         } else {
           // Wait for refresh to complete
-          return new Promise<T>((resolve) => {
+          return new Promise<T>((resolve, reject) => {
             this.subscribeTokenRefresh((newToken) => {
+              if (!newToken) {
+                reject(new Error('Your session has expired. Please sign in again.'));
+                return;
+              }
               headers['Authorization'] = `Bearer ${newToken}`;
               resolve(this.request<T>(endpoint, { ...options, headers }, true));
             });
@@ -117,8 +111,9 @@ class ApiClient {
 
       const json = await response.json();
       return json.data !== undefined ? json.data : json;
-    } catch (error) {
-      throw error;
+    } finally {
+      window.clearTimeout(timeoutId);
+      options.signal?.removeEventListener('abort', abortExternalRequest);
     }
   }
 

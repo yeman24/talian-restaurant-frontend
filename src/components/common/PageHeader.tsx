@@ -1,5 +1,4 @@
 import React from 'react'
-import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 
@@ -19,7 +18,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   accentImage,
 }) => {
   return (
-    <div className="relative pt-36 pb-20 md:pt-44 md:pb-28 overflow-hidden border-b border-stone-800/60">
+    <div className="relative pt-36 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-gradient-to-b from-[#f7ebc8]/60 via-[#fcf5df] to-[#fcf5df] border-b border-[#e2d7ba]">
       {/* Background ambient lighting */}
       <div className="absolute inset-0 bg-radial-luxury opacity-70 pointer-events-none" />
       {accentImage && (
@@ -27,9 +26,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           <img
             src={accentImage}
             alt=""
+            width="1200"
+            height="600"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover object-center filter blur-sm scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#08090c] via-[#08090c]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#fcf5df] via-[#fcf5df]/80 to-transparent" />
         </div>
       )}
 
@@ -37,21 +40,21 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         {/* Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 mb-6">
-            <Link to="/" className="text-xs tracking-widest uppercase text-stone-400 hover:text-[#c5a059] transition-colors">
+            <Link to="/" className="text-xs tracking-widest uppercase text-[#12141a]/60 hover:text-[#12141a] transition-colors font-sans">
               Home
             </Link>
             {breadcrumbs.map((crumb, idx) => (
               <React.Fragment key={idx}>
-                <ChevronRight className="w-3 h-3 text-stone-600" />
+                <ChevronRight className="w-3 h-3 text-[#12141a]/40" />
                 {crumb.href ? (
                   <Link
                     to={crumb.href}
-                    className="text-xs tracking-widest uppercase text-stone-400 hover:text-[#c5a059] transition-colors"
+                    className="text-xs tracking-widest uppercase text-[#12141a]/60 hover:text-[#12141a] transition-colors font-sans"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className="text-xs tracking-widest uppercase text-[#c5a059]">
+                  <span className="text-xs tracking-widest uppercase text-[#12141a] font-semibold font-sans">
                     {crumb.label}
                   </span>
                 )}
@@ -61,38 +64,23 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         )}
 
         {eyebrow && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-3 mb-4"
-          >
-            <span className="h-[1px] w-8 bg-[#c5a059]/40" />
-            <span className="text-xs tracking-[0.3em] uppercase text-[#c5a059] font-medium font-sans">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <span className="h-[1px] w-8 bg-[#12141a]/20" />
+            <span className="text-xs tracking-[0.25em] uppercase text-[#12141a] font-semibold font-sans">
               {eyebrow}
             </span>
-            <span className="h-[1px] w-8 bg-[#c5a059]/40" />
-          </motion.div>
+            <span className="h-[1px] w-8 bg-[#12141a]/20" />
+          </div>
         )}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl font-light font-serif tracking-tight text-white mb-6"
-        >
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif tracking-normal text-[#12141a] mb-6">
           {title}
-        </motion.h1>
+        </h1>
 
         {subtitle && (
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="max-w-2xl mx-auto text-base sm:text-lg text-stone-300 font-light leading-relaxed font-sans"
-          >
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#4a5160] leading-relaxed font-sans">
             {subtitle}
-          </motion.p>
+          </p>
         )}
       </div>
     </div>

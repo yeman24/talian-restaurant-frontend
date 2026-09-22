@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { MapAndHours } from '@/components/contact/MapAndHours'
@@ -11,17 +12,29 @@ export const ContactPage: React.FC = () => {
         title="Location & Enquiries"
         subtitle="14–16 Royal Terrace Vaults, Edinburgh. Carved into historic Georgian stone, overlooking Calton Hill."
         breadcrumbs={[{ label: 'Contact' }]}
-        accentImage="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=85"
+        accentImage="/images/vault_dining.jpg"
       />
 
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-6">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-6"
+          >
             <ContactForm />
-          </div>
-          <div className="lg:col-span-6">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="lg:col-span-6"
+          >
             <MapAndHours />
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

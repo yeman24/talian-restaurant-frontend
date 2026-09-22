@@ -22,7 +22,9 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
-  const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem(ACCESS_TOKEN_KEY))
+  const [accessToken, setAccessToken] = useState<string | null>(() => {
+    return typeof window !== 'undefined' ? localStorage.getItem(ACCESS_TOKEN_KEY) : null
+  })
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
   const { toast } = useToast()
@@ -30,34 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Verify session on mount
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem(ACCESS_TOKEN_KEY)
-      const savedUserStr = localStorage.getItem('aura_user_profile')
-
-      if (!token) {
-        setIsLoading(false)
-        return
-      }
-
       try {
         const profile = await apiClient.get<UserProfile>('/auth/me')
         setUser(profile)
         localStorage.setItem('aura_user_profile', JSON.stringify(profile))
       } catch {
-        // If backend is offline or network fails, keep saved profile if available
-        if (savedUserStr) {
-          try {
-            setUser(JSON.parse(savedUserStr))
-          } catch {
-            apiClient.clearTokens()
-            localStorage.removeItem('aura_user_profile')
-            setUser(null)
-            setAccessToken(null)
-          }
-        } else {
-          apiClient.clearTokens()
-          setUser(null)
-          setAccessToken(null)
-        }
+        apiClient.clearTokens()
+        localStorage.removeItem('aura_user_profile')
+        setUser(null)
       } finally {
         setIsLoading(false)
       }
@@ -69,37 +51,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      let res: AuthResponse
-      try {
-        res = await apiClient.post<AuthResponse>('/auth/login', { email, password })
-      } catch (networkErr: any) {
-        // Fallback for standalone / offline demo mode
-        const isSommelier = email.toLowerCase().includes('sommelier')
-        const isAdminUser = email.toLowerCase().includes('admin') || (!isSommelier && !email.toLowerCase().includes('customer'))
-
-        const mockUser: UserProfile = {
-          id: isAdminUser ? 'usr-admin-01' : isSommelier ? 'usr-somm-02' : 'usr-cust-03',
-          email,
-          firstName: isAdminUser ? 'Alistair' : isSommelier ? 'Fiona' : 'Julian',
-          lastName: isAdminUser ? 'MacRae' : isSommelier ? 'Sinclair' : 'Vane',
-          phone: '+44 131 555 0192',
-          role: isAdminUser ? 'ADMIN' : isSommelier ? 'SOMMELIER' : 'CUSTOMER',
-          createdAt: new Date().toISOString(),
-        }
-
-        res = {
-          user: mockUser,
-          accessToken: 'demo-jwt-access-token-aura-2025',
-          refreshToken: 'demo-jwt-refresh-token-aura-2025',
-          tokenType: 'Bearer',
-          expiresIn: '15m',
-        }
-      }
-
-      localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken)
-      localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken)
+      const res = await apiClient.post<AuthResponse>('/auth/login', { email, password })
       localStorage.setItem('aura_user_profile', JSON.stringify(res.user))
-      setAccessToken(res.accessToken)
+      if (res.accessToken) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken)
+        setAccessToken(res.accessToken)
+      }
+      if (res.refreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken)
+      }
       setUser(res.user)
       setIsAuthModalOpen(false)
 
@@ -129,34 +89,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }) => {
     setIsLoading(true)
     try {
-      let res: AuthResponse
-      try {
-        res = await apiClient.post<AuthResponse>('/auth/register', data)
-      } catch {
-        // Standalone offline registration fallback
-        const mockUser: UserProfile = {
-          id: `usr-${Date.now()}`,
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phone,
-          role: 'CUSTOMER',
-          createdAt: new Date().toISOString(),
-        }
-
-        res = {
-          user: mockUser,
-          accessToken: 'demo-jwt-access-token-new',
-          refreshToken: 'demo-jwt-refresh-token-new',
-          tokenType: 'Bearer',
-          expiresIn: '15m',
-        }
-      }
-
-      localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken)
-      localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken)
+      const res = await apiClient.post<AuthResponse>('/auth/register', data)
       localStorage.setItem('aura_user_profile', JSON.stringify(res.user))
-      setAccessToken(res.accessToken)
+      if (res.accessToken) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken)
+        setAccessToken(res.accessToken)
+      }
+      if (res.refreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken)
+      }
       setUser(res.user)
       setIsAuthModalOpen(false)
 
@@ -179,13 +120,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = useCallback(async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-      await apiClient.post('/auth/logout', { refreshToken }).catch(() => null)
+      await apiClient.post('/auth/logout', {}).catch(() => null)
     } finally {
       apiClient.clearTokens()
       localStorage.removeItem('aura_user_profile')
-      setUser(null)
       setAccessToken(null)
+      setUser(null)
       toast({
         title: 'Signed Out',
         message: 'You have been safely disconnected from your session.',
@@ -195,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [toast])
 
 
-  const isAuthenticated = Boolean(user && accessToken)
+  const isAuthenticated = Boolean(user)
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER'
   const isStaff = isAdmin || user?.role === 'SOMMELIER' || user?.role === 'STAFF'
 
