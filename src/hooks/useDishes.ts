@@ -4,6 +4,13 @@ import { IS_DEMO_MODE } from '@/lib/runtime'
 import type {
   Dish,
   TastingMenu,
+  Category,
+  CreateDishPayload,
+  UpdateDishPayload,
+  CreateTastingMenuPayload,
+  UpdateTastingMenuPayload,
+  CreateCategoryPayload,
+  UpdateCategoryPayload,
   Review,
   GalleryItem,
   ReservationPayload,
@@ -21,6 +28,7 @@ const loadMockData = () => import('@/data/mockData')
 const normalizeDish = (item: any): Dish => ({
   ...item,
   category: typeof item.category === 'string' ? item.category : item.category?.slug || item.category?.name || '',
+  categoryId: item.categoryId || (typeof item.category === 'object' ? item.category?.id : undefined),
   price: Number(item.price),
 })
 
@@ -509,3 +517,126 @@ export function useSubmitNewsletter() {
     },
   })
 }
+
+// 14. Course Categories Hooks & Mutations
+export function useCategories() {
+  return useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      if (!IS_DEMO_MODE) {
+        return apiClient.get<Category[]>('/categories')
+      }
+      return [
+        { id: 'cat-1', name: 'Tasting Signature', slug: 'tasting', description: 'Sequential 8-course degustation courses', displayOrder: 1 },
+        { id: 'cat-2', name: 'Highland & Coastal À La Carte', slug: 'alacarte', description: 'Individual seasonal dishes', displayOrder: 2 },
+        { id: 'cat-3', name: 'Foraged & Plant-Based', slug: 'plant', description: 'Caledonian wild flora, ancient grains and roots', displayOrder: 3 },
+      ]
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateCategoryPayload) => apiClient.post<Category>('/categories', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryPayload }) =>
+      apiClient.patch<Category>(`/categories/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: ['dishes'] })
+    },
+  })
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiClient.delete(`/categories/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: ['dishes'] })
+    },
+  })
+}
+
+// 15. Dish CRUD Mutations
+export function useCreateDish() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateDishPayload) => apiClient.post<Dish>('/menu/dishes', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export function useUpdateDish() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateDishPayload }) =>
+      apiClient.patch<Dish>(`/menu/dishes/${id}`, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] })
+      queryClient.invalidateQueries({ queryKey: ['dish', variables.id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export function useDeleteDish() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiClient.delete(`/menu/dishes/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+// 16. Tasting Menu CRUD Mutations
+export function useCreateTastingMenu() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateTastingMenuPayload) => apiClient.post<TastingMenu>('/menu/tasting-menus', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasting-menus'] })
+    },
+  })
+}
+
+export function useUpdateTastingMenu() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateTastingMenuPayload }) =>
+      apiClient.patch<TastingMenu>(`/menu/tasting-menus/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasting-menus'] })
+    },
+  })
+}
+
+export function useDeleteTastingMenu() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiClient.delete(`/menu/tasting-menus/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasting-menus'] })
+    },
+  })
+}
+

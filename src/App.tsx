@@ -62,6 +62,12 @@ export function App() {
       '/gallery': 'The Gallery | AURA Edinburgh',
       '/reservations': 'Reserve an Experience | AURA Edinburgh',
       '/contact': 'Contact & Location | AURA Edinburgh',
+      '/admin': 'Executive Operations | AURA Atelier Console',
+      '/admin/reservations': 'Reservations & Sittings | AURA Atelier Console',
+      '/admin/menu': 'Menu & Course Atelier | AURA Atelier Console',
+      '/admin/media': 'Media Archive | AURA Atelier Console',
+      '/admin/cellar': 'Sommelier & Wine Cellar | AURA Atelier Console',
+      '/admin/inquiries': 'VIP & Vault Inquiries | AURA Atelier Console',
       '/admin/login': 'Staff Login | AURA Edinburgh',
     }
     document.title = titles[location.pathname] || (location.pathname.startsWith('/menu/') ? 'Dish Detail | AURA Edinburgh' : 'AURA Edinburgh')
@@ -95,6 +101,16 @@ export function App() {
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
               path="/admin"
+              element={
+                <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER', 'SOMMELIER', 'STAFF']}>
+                  <AdminLayout>
+                    <AdminPage />
+                  </AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/*"
               element={
                 <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER', 'SOMMELIER', 'STAFF']}>
                   <AdminLayout>

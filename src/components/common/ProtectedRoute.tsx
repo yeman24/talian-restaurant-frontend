@@ -1,7 +1,6 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { AdminLoginPage } from '@/pages/AdminLoginPage'
 import { ShieldAlert, ArrowLeft } from 'lucide-react'
 import type { UserRole } from '@/types'
 
@@ -15,6 +14,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRoles,
 }) => {
   const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -25,7 +25,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    return <AdminLoginPage />
+    return <Navigate to="/admin/login" state={{ from: location }} replace />
   }
 
   if (requiredRoles && requiredRoles.length > 0 && user && !requiredRoles.includes(user.role)) {

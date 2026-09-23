@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { pathToTab, tabPaths } from './AdminSidebar'
 import type { AdminTab } from './AdminSidebar'
 
 interface AdminContextValue {
@@ -13,9 +15,25 @@ interface AdminContextValue {
 const AdminContext = createContext<AdminContextValue | undefined>(undefined)
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const currentTab = pathToTab(location.pathname)
+  const [activeTab, setActiveTabState] = useState<AdminTab>(currentTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  useEffect(() => {
+    const tab = pathToTab(location.pathname)
+    setActiveTabState(tab)
+  }, [location.pathname])
+
+  const setActiveTab = (tab: AdminTab) => {
+    setActiveTabState(tab)
+    const targetPath = tabPaths[tab]
+    if (location.pathname !== targetPath) {
+      navigate(targetPath)
+    }
+  }
 
   return (
     <AdminContext.Provider

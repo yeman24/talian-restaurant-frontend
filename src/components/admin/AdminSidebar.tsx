@@ -16,6 +16,24 @@ import {
 
 export type AdminTab = 'overview' | 'reservations' | 'menu' | 'media' | 'cellar' | 'inquiries'
 
+export const tabPaths: Record<AdminTab, string> = {
+  overview: '/admin',
+  reservations: '/admin/reservations',
+  menu: '/admin/menu',
+  media: '/admin/media',
+  cellar: '/admin/cellar',
+  inquiries: '/admin/inquiries',
+}
+
+export const pathToTab = (pathname: string): AdminTab => {
+  if (pathname.startsWith('/admin/reservations')) return 'reservations'
+  if (pathname.startsWith('/admin/menu')) return 'menu'
+  if (pathname.startsWith('/admin/media')) return 'media'
+  if (pathname.startsWith('/admin/cellar')) return 'cellar'
+  if (pathname.startsWith('/admin/inquiries')) return 'inquiries'
+  return 'overview'
+}
+
 interface AdminSidebarProps {
   activeTab: AdminTab
   onSelectTab: (tab: AdminTab) => void
@@ -51,7 +69,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const handleLogout = async () => {
     await logout()
-    navigate('/admin')
+    navigate('/admin/login')
   }
 
   const sections: NavSection[] = [
@@ -168,8 +186,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 const isActive = activeTab === item.id
 
                 return (
-                  <button
+                  <Link
                     key={item.id}
+                    to={tabPaths[item.id]}
                     onClick={() => {
                       onSelectTab(item.id)
                       onCloseMobile()
@@ -213,7 +232,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#c5a059] rounded-r-full"
                       />
                     )}
-                  </button>
+                  </Link>
                 )
               })}
             </div>

@@ -36,12 +36,26 @@ export interface WinePairing {
   notes: string
 }
 
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string | null
+  displayOrder: number
+  createdAt?: string
+  updatedAt?: string
+  _count?: {
+    dishes: number
+  }
+}
+
 export interface Dish {
   id: string
   slug?: string
   name: string
   gaelicName?: string
   category: CourseCategory | string
+  categoryId?: string
   courseNumber?: number
   description: string
   story: string
@@ -55,6 +69,25 @@ export interface Dish {
   isSignature?: boolean
 }
 
+export interface CreateDishPayload {
+  name: string
+  gaelicName?: string
+  categoryId: string
+  courseNumber?: number
+  description: string
+  story: string
+  provenance: string
+  price: number
+  image: string
+  isSignature?: boolean
+  isChefRecommendation?: boolean
+  winePairing?: WinePairing | null
+  dietary?: DietaryTag[]
+  allergens?: string[]
+}
+
+export type UpdateDishPayload = Partial<CreateDishPayload>
+
 export interface TastingMenu {
   id: string
   slug?: string
@@ -66,6 +99,7 @@ export interface TastingMenu {
   prestigePairingPrice: number
   coursesCount: number
   duration: string
+  isActive?: boolean
   courses: {
     number: number
     title: string
@@ -75,6 +109,38 @@ export interface TastingMenu {
     pairing: string
   }[]
 }
+
+export interface CreateTastingMenuPayload {
+  title: string
+  slug?: string
+  subtitle: string
+  description: string
+  price: number
+  pairingPrice: number
+  prestigePairingPrice?: number
+  coursesCount: number
+  duration?: string
+  isActive?: boolean
+  courses: {
+    number: number
+    title: string
+    gaelicTitle?: string
+    description: string
+    dishId?: string
+    pairing: string
+  }[]
+}
+
+export type UpdateTastingMenuPayload = Partial<CreateTastingMenuPayload>
+
+export interface CreateCategoryPayload {
+  name: string
+  slug?: string
+  description?: string
+  displayOrder?: number
+}
+
+export type UpdateCategoryPayload = Partial<CreateCategoryPayload>
 
 export interface GalleryItem {
   id: string

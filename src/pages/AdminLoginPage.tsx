@@ -1,16 +1,25 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/common/Button'
 import { Lock, Mail, Shield, ArrowLeft } from 'lucide-react'
 
 export const AdminLoginPage: React.FC = () => {
-  const { login, isLoading } = useAuth()
+  const { login, isLoading, isAuthenticated, isStaff } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const from = (location.state as any)?.from?.pathname || '/admin'
+
+  useEffect(() => {
+    if (isAuthenticated && isStaff) {
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, isStaff, navigate, from])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +31,7 @@ export const AdminLoginPage: React.FC = () => {
 
     try {
       await login(email, password)
-      navigate('/admin')
+      navigate(from, { replace: true })
     } catch (err: any) {
       setErrorMessage(err?.message || 'Authentication failed. Please check credentials.')
     }
