@@ -4,7 +4,7 @@ export const ACCESS_TOKEN_KEY = 'aura_access_token';
 export const REFRESH_TOKEN_KEY = 'aura_refresh_token';
 
 class ApiClient {
-  private readonly requestTimeoutMs = 8000;
+  private readonly requestTimeoutMs = 60000; // 60s timeout accommodates Render free-tier cold starts
   private isRefreshing = false;
   private refreshSubscribers: ((token: string | null) => void)[] = [];
 
