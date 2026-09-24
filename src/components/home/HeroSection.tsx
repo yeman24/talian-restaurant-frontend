@@ -9,10 +9,10 @@ export const HeroSection: React.FC = () => {
       {/* Background Image with Cinematic Scottish Atmosphere & Parchment Base Blend */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=2000&q=90"
+          src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1600&q=80"
           alt="Historic subterranean dining vaults at AURA Edinburgh"
-          width="2000"
-          height="1200"
+          width="1600"
+          height="960"
           fetchPriority="high"
           decoding="async"
           onError={(e) => {

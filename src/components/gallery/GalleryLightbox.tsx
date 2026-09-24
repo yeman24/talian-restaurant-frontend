@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGallery } from '@/hooks/useDishes'
 import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getOptimizedImageUrl } from '@/lib/utils'
 import { ErrorState } from '@/components/common/ErrorState'
 
 export const GalleryLightbox: React.FC = () => {
@@ -96,7 +96,7 @@ export const GalleryLightbox: React.FC = () => {
             className="group relative rounded-2xl overflow-hidden cursor-pointer bg-stone-100 border border-[#e2d7ba] hover:border-[#12141a] aspect-[4/3] shadow-sm hover:shadow-md"
           >
             <img
-              src={item.image || item.imageUrl || '/images/vault_dining.jpg'}
+              src={getOptimizedImageUrl(item.image || item.imageUrl || '/images/vault_dining.jpg', 800, 80)}
               alt={item.title}
               width="1200"
               height="900"
@@ -177,7 +177,7 @@ export const GalleryLightbox: React.FC = () => {
               >
                 <img
                   loading="lazy"
-                  src={activePhoto.image || activePhoto.imageUrl || '/images/vault_dining.jpg'}
+                  src={getOptimizedImageUrl(activePhoto.image || activePhoto.imageUrl || '/images/vault_dining.jpg', 1200, 85)}
                   alt={activePhoto.title}
                   width="1600"
                   height="1200"

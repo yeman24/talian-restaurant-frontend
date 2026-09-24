@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Dish } from '@/types'
 import { Badge } from '@/components/common/Badge'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, getOptimizedImageUrl } from '@/lib/utils'
 import { Wine, ArrowUpRight, Sparkles } from 'lucide-react'
 
 interface DishCardProps {
@@ -12,6 +12,9 @@ interface DishCardProps {
 }
 
 export const DishCard: React.FC<DishCardProps> = ({ dish }) => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const imageUrl = getOptimizedImageUrl(dish.image, 800, 80)
+
   return (
     <motion.article
       layout
@@ -24,21 +27,24 @@ export const DishCard: React.FC<DishCardProps> = ({ dish }) => {
       {/* Image Container with Ambient Gradient */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100">
         <img
-          src={dish.image || '/images/chanterelles.jpg'}
+          src={imageUrl}
           alt={dish.name}
           width="800"
           height="600"
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
           loading="lazy"
           decoding="async"
+          onLoad={() => setImageLoaded(true)}
           onError={(e) => {
             if (e.currentTarget.src !== window.location.origin + '/images/chanterelles.jpg') {
               e.currentTarget.src = '/images/chanterelles.jpg';
             }
           }}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-95 group-hover:brightness-100"
+          className={`w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500 ease-out brightness-95 group-hover:brightness-100 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">

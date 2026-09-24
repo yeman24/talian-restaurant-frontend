@@ -46,7 +46,7 @@ export const AboutPage: React.FC = () => {
         title="Born of Stone, Heather, and Tides"
         subtitle="A culinary reflection of the Scottish wilderness, curated inside the historic stone vaults of Edinburgh."
         breadcrumbs={[{ label: 'About' }]}
-        accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85"
+        accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=70"
       />
 
       <div className="max-w-7xl mx-auto px-6 py-20 space-y-28">

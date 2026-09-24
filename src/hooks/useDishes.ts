@@ -80,6 +80,7 @@ export function useDishes(filters?: {
       return list
     },
     staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData) => previousData,
   })
 }
 
@@ -95,6 +96,7 @@ export function useDish(idOrSlug: string | undefined) {
       return DISHES.find((d) => d.id === idOrSlug || d.slug === idOrSlug)
     },
     enabled: Boolean(idOrSlug),
+    placeholderData: (previousData) => previousData,
   })
 }
 
@@ -109,6 +111,7 @@ export function useTastingMenus() {
       return TASTING_MENUS
     },
     staleTime: 1000 * 60 * 10,
+    placeholderData: (previousData) => previousData,
   })
 }
 

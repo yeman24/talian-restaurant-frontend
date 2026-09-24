@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/common/Badge'
 import { ButtonLink } from '@/components/common/ButtonLink'
 import { Skeleton } from '@/components/common/Skeleton'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, getOptimizedImageUrl } from '@/lib/utils'
 import {
   Wine,
   MapPin,
@@ -74,7 +74,7 @@ export const DishDetailPage: React.FC = () => {
           { label: 'Menu', href: '/menu' },
           { label: dish.name },
         ]}
-        accentImage={dish.image}
+        accentImage={getOptimizedImageUrl(dish.image, 800, 70)}
       />
 
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -88,10 +88,10 @@ export const DishDetailPage: React.FC = () => {
               className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-[#e2d7ba] shadow-xl bg-stone-100 group"
             >
               <img
-                src={dish.image || '/images/chanterelles.jpg'}
+                src={getOptimizedImageUrl(dish.image, 1000, 80)}
                 alt={dish.name}
-                width="1200"
-                height="900"
+                width="1000"
+                height="750"
                 sizes="(min-width: 1024px) 55vw, 100vw"
                 loading="eager"
                 decoding="async"

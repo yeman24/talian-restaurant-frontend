@@ -28,7 +28,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             alt=""
             width="1200"
             height="600"
-            loading="lazy"
             decoding="async"
             className="w-full h-full object-cover object-center filter blur-sm scale-105"
           />

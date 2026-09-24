@@ -73,6 +73,13 @@ export function App() {
     document.title = titles[location.pathname] || (location.pathname.startsWith('/menu/') ? 'Dish Detail | AURA Edinburgh' : 'AURA Edinburgh')
   }, [location.pathname])
 
+  useEffect(() => {
+    // Proactively warm up backend service in the background if asleep
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
+    const healthUrl = apiUrl.replace(/\/api\/v1\/?$/, '/api/v1/health')
+    fetch(healthUrl, { method: 'GET', keepalive: true }).catch(() => {})
+  }, [])
+
   return (
     <div
       className="min-h-screen bg-[#fcf5df] text-[#12141a] flex flex-col justify-between selection:bg-[#12141a] selection:text-[#fcf5df]"

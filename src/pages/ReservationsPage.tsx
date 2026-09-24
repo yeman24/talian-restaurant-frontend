@@ -36,7 +36,7 @@ export const ReservationsPage: React.FC = () => {
           title="Reserve an Experience"
           subtitle="We invite you to join us for our Autumn Tasting Menu. Every sitting is prepared with meticulous bespoke attention."
           breadcrumbs={[{ label: 'Reservations' }]}
-          accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85"
+          accentImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=70"
         />
       </div>
 

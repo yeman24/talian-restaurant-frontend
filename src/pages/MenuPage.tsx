@@ -48,7 +48,7 @@ export const MenuPage: React.FC = () => {
         title="The Autumn Tasting Arc"
         subtitle="A seasonal dialogue between Scotland’s untamed wilderness, highland estates, and hand-harvested coastal waters."
         breadcrumbs={[{ label: 'Menu' }]}
-        accentImage="https://images.unsplash.com/photo-1612204078213-a227dba74093?auto=format&fit=crop&w=1200&q=85"
+        accentImage="https://images.unsplash.com/photo-1612204078213-a227dba74093?auto=format&fit=crop&w=800&q=70"
       />
 
       <div className="max-w-7xl mx-auto px-6 py-16">
