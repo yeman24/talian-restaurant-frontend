@@ -13,8 +13,8 @@ export const reservationSchema = z.object({
   phone: z.string().min(7, 'Please provide a contact telephone number'),
   dietaryNotes: z.string().optional(),
   specialOccasion: z.string().optional(),
-  agreeToPolicy: z.literal(true, {
-    errorMap: () => ({ message: 'You must accept the reservation and cancellation policy' }),
+  agreeToPolicy: z.boolean().refine((val) => val === true, {
+    message: 'You must accept the reservation and cancellation policy',
   }),
 })
 

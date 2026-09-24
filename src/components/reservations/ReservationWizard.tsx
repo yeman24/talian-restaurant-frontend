@@ -287,7 +287,7 @@ export const ReservationWizard: React.FC = () => {
     trigger,
     formState: { errors },
   } = useForm<ReservationFormInput>({
-    resolver: zodResolver(reservationSchema) as any,
+    resolver: zodResolver(reservationSchema),
     defaultValues: {
       guests: 2,
       date: defaultDateStr,
@@ -747,7 +747,7 @@ export const ReservationWizard: React.FC = () => {
               ))}
             </div>
 
-            <form onSubmit={handleSubmit((data: any) => onSubmit(data))}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               {/* STEP 1: Guests, Date, Service, Time */}
               {currentStep === 1 && (
                 <motion.div
