@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Dish } from '@/types'
@@ -12,7 +12,6 @@ interface DishCardProps {
 }
 
 export const DishCard: React.FC<DishCardProps> = ({ dish }) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
   const imageUrl = getOptimizedImageUrl(dish.image, 800, 80)
 
   return (
@@ -32,17 +31,13 @@ export const DishCard: React.FC<DishCardProps> = ({ dish }) => {
           width="800"
           height="600"
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
-          loading="lazy"
           decoding="async"
-          onLoad={() => setImageLoaded(true)}
           onError={(e) => {
             if (e.currentTarget.src !== window.location.origin + '/images/chanterelles.jpg') {
               e.currentTarget.src = '/images/chanterelles.jpg';
             }
           }}
-          className={`w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500 ease-out brightness-95 group-hover:brightness-100 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out brightness-95 group-hover:brightness-100"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 

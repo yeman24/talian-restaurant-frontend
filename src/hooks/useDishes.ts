@@ -22,6 +22,8 @@ import type {
   CellarItem,
 } from '@/types'
 
+import { DISHES, TASTING_MENUS } from '@/data/mockData'
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const loadMockData = () => import('@/data/mockData')
 
@@ -79,6 +81,29 @@ export function useDishes(filters?: {
 
       return list
     },
+    initialData: () => {
+      let list = [...DISHES]
+      if (filters?.category && filters.category !== 'all') {
+        list = list.filter((item) => item.category === filters.category)
+      }
+      if (filters?.dietary && filters.dietary !== 'all') {
+        list = list.filter((item) =>
+          item.dietary.includes(filters.dietary as any)
+        )
+      }
+      if (filters?.search && filters.search.trim()) {
+        const q = filters.search.toLowerCase()
+        list = list.filter(
+          (item) =>
+            item.name.toLowerCase().includes(q) ||
+            item.description.toLowerCase().includes(q) ||
+            item.provenance.toLowerCase().includes(q) ||
+            (item.gaelicName && item.gaelicName.toLowerCase().includes(q))
+        )
+      }
+      return list
+    },
+    initialDataUpdatedAt: 0,
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData) => previousData,
   })
@@ -95,6 +120,11 @@ export function useDish(idOrSlug: string | undefined) {
       await delay(80)
       return DISHES.find((d) => d.id === idOrSlug || d.slug === idOrSlug)
     },
+    initialData: () => {
+      if (!idOrSlug) return undefined
+      return DISHES.find((d) => d.id === idOrSlug || d.slug === idOrSlug)
+    },
+    initialDataUpdatedAt: 0,
     enabled: Boolean(idOrSlug),
     placeholderData: (previousData) => previousData,
   })
@@ -110,6 +140,8 @@ export function useTastingMenus() {
       await delay(80)
       return TASTING_MENUS
     },
+    initialData: () => TASTING_MENUS,
+    initialDataUpdatedAt: 0,
     staleTime: 1000 * 60 * 10,
     placeholderData: (previousData) => previousData,
   })
